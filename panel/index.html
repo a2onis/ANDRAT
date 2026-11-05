@@ -1,0 +1,212 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="theme-color" content="#f6f8f7">
+  <meta name="description" content="A consent-based Android remote control panel.">
+  <title>Andrat / Control panel</title>
+  <link rel="stylesheet" href="styles.css">
+  <script src="config.js"></script>
+</head>
+<body>
+  <div class="page-noise" aria-hidden="true"></div>
+  <header class="site-header">
+    <a class="brand" href="./" aria-label="Andrat Control home">
+      <span class="brand-mark">A</span>
+      <span>
+        <strong>ANDRAT</strong>
+        <small>CONTROL PANEL</small>
+      </span>
+    </a>
+    <div class="header-actions">
+      <span class="secure-note"><span class="status-dot muted"></span> Your panel, your device</span>
+      <a class="github-link" href="https://github.com/a2onis/ANDRAT" target="_blank" rel="noreferrer">View source <span aria-hidden="true">↗</span></a>
+    </div>
+  </header>
+
+  <main class="shell">
+    <aside class="sidebar">
+      <section class="intro-copy">
+        <p class="eyebrow">Remote controls, kept clear</p>
+        <h1>A calm way to reach your Android.</h1>
+        <p>Pair a device with a private capability token, then send a small set of visible, consent-based actions from anywhere.</p>
+      </section>
+
+      <section class="panel-card pair-card">
+        <div class="card-heading">
+          <div>
+            <span class="step-number">01</span>
+            <h2>Pair a device</h2>
+          </div>
+          <span id="pair-state" class="mini-state">NOT CONNECTED</span>
+        </div>
+        <form id="pair-form" novalidate>
+          <label for="database-url">Realtime Database URL</label>
+          <input id="database-url" name="database-url" type="url" inputmode="url" placeholder="https://project-default-rtdb.firebaseio.com" autocomplete="url" required>
+          <p class="field-help">This is the Firebase Realtime Database URL shared by the app and panel.</p>
+
+          <label for="device-id">Device ID</label>
+          <input id="device-id" name="device-id" type="text" placeholder="Paste the ID from the app" autocomplete="off" spellcheck="false" required>
+
+          <label for="control-token">Control token</label>
+          <div class="secret-input">
+            <input id="control-token" name="control-token" type="password" placeholder="Paste the token from the app" autocomplete="off" spellcheck="false" required>
+            <button id="toggle-token" class="icon-button" type="button" aria-label="Show control token">Show</button>
+          </div>
+          <p class="field-help">The token is the control key. Keep it out of public issue comments and screenshots.</p>
+
+          <button id="connect-button" class="button button-primary button-full" type="submit">
+            <span>Connect to device</span><span aria-hidden="true">→</span>
+          </button>
+        </form>
+        <button id="disconnect-button" class="button button-quiet button-full hidden" type="button">Disconnect this device</button>
+      </section>
+
+      <section class="how-it-works">
+        <p class="eyebrow">How it works</p>
+        <ol class="steps">
+          <li><span>1</span><p>Install the debug APK from the GitHub Actions artifact.</p></li>
+          <li><span>2</span><p>Copy its device ID and control token into this panel.</p></li>
+          <li><span>3</span><p>Start the app's visible foreground connection, then control it here.</p></li>
+        </ol>
+      </section>
+
+      <div class="privacy-note">
+        <span class="note-icon" aria-hidden="true">◎</span>
+        <p><strong>Designed for consent.</strong> The app exposes only ping, vibration, flashlight, notification, and status actions. No hidden access or screen capture.</p>
+      </div>
+    </aside>
+
+    <section class="workspace" aria-live="polite">
+      <div id="empty-state" class="empty-state">
+        <div class="empty-illustration" aria-hidden="true">
+          <span class="orbit orbit-one"></span>
+          <span class="orbit orbit-two"></span>
+          <span class="empty-core">A</span>
+        </div>
+        <p class="eyebrow">Waiting for a pairing</p>
+        <h2>Your control room is ready.</h2>
+        <p>Enter the database URL, device ID, and control token to load a device workspace.</p>
+        <button id="focus-pair-button" class="button button-secondary" type="button">Start pairing <span aria-hidden="true">↗</span></button>
+      </div>
+
+      <div id="dashboard" class="dashboard hidden">
+        <div class="dashboard-heading">
+          <div>
+            <p class="eyebrow">Device workspace</p>
+            <h2 id="device-name">Android device</h2>
+            <p class="device-subtitle"><span id="device-id-short">—</span><span class="separator">•</span><span id="app-version">Andrat Control</span></p>
+          </div>
+          <div id="dashboard-status" class="dashboard-status offline"><span class="status-dot"></span><span id="dashboard-status-label">Waiting</span></div>
+        </div>
+
+        <div class="status-grid">
+          <article class="status-card status-card-wide">
+            <div class="status-card-icon teal" aria-hidden="true">◌</div>
+            <div>
+              <span class="stat-label">Connection</span>
+              <strong id="connection-detail">Waiting for the app</strong>
+              <small id="last-seen">No status heartbeat yet</small>
+            </div>
+          </article>
+          <article class="status-card">
+            <div class="status-card-icon orange" aria-hidden="true">⌁</div>
+            <div>
+              <span class="stat-label">Capabilities</span>
+              <strong id="capabilities">—</strong>
+              <small>Published by device</small>
+            </div>
+          </article>
+          <article class="status-card">
+            <div class="status-card-icon blue" aria-hidden="true">⌂</div>
+            <div>
+              <span class="stat-label">Permissions</span>
+              <strong id="permissions">—</strong>
+              <small>Local approval status</small>
+            </div>
+          </article>
+        </div>
+
+        <section class="control-section">
+          <div class="section-heading">
+            <div>
+              <p class="eyebrow">02 / Actions</p>
+              <h3>Send a considered command</h3>
+            </div>
+            <span class="queue-note"><span class="status-dot muted"></span> Commands queue safely</span>
+          </div>
+
+          <div class="controls-grid">
+            <article class="control-card">
+              <div class="control-card-top">
+                <div class="control-icon teal-bg" aria-hidden="true">↯</div>
+                <span class="control-kicker">CHECK-IN</span>
+              </div>
+              <h4>Ping device</h4>
+              <p>Ask the app to confirm that the connection is responsive.</p>
+              <button id="ping-button" class="button button-secondary button-full" type="button">Send ping <span aria-hidden="true">→</span></button>
+            </article>
+
+            <article class="control-card">
+              <div class="control-card-top">
+                <div class="control-icon orange-bg" aria-hidden="true">≋</div>
+                <span class="control-kicker">HAPTIC</span>
+              </div>
+              <h4>Vibrate</h4>
+              <p>Send a short, bounded vibration to the paired phone.</p>
+              <div class="range-row">
+                <input id="vibrate-duration" type="range" min="50" max="2000" step="50" value="350" aria-label="Vibration duration in milliseconds">
+                <output id="vibrate-value" for="vibrate-duration">350 ms</output>
+              </div>
+              <button id="vibrate-button" class="button button-secondary button-full" type="button">Vibrate now <span aria-hidden="true">→</span></button>
+            </article>
+
+            <article class="control-card">
+              <div class="control-card-top">
+                <div class="control-icon blue-bg" aria-hidden="true">✦</div>
+                <span class="control-kicker">LIGHT</span>
+              </div>
+              <h4>Flashlight</h4>
+              <p>Toggle the rear flashlight when camera permission is allowed.</p>
+              <button id="flashlight-button" class="button button-secondary button-full" type="button">Turn flashlight on <span aria-hidden="true">→</span></button>
+            </article>
+
+            <article class="control-card notice-card">
+              <div class="control-card-top">
+                <div class="control-icon violet-bg" aria-hidden="true">✎</div>
+                <span class="control-kicker">NOTICE</span>
+              </div>
+              <h4>Show a notice</h4>
+              <p>Display a visible notification on the device. Keep it useful and brief.</p>
+              <div class="notice-input-row">
+                <input id="notice-message" type="text" maxlength="200" placeholder="A short message" aria-label="Notification message">
+                <button id="notice-button" class="button button-primary" type="button">Send</button>
+              </div>
+            </article>
+          </div>
+        </section>
+
+        <section class="activity-section">
+          <div class="section-heading compact">
+            <div>
+              <p class="eyebrow">03 / Activity</p>
+              <h3>Command history</h3>
+            </div>
+            <button id="refresh-button" class="text-button" type="button">Refresh <span aria-hidden="true">↻</span></button>
+          </div>
+          <div id="activity-list" class="activity-list">
+            <div class="activity-empty">No commands sent in this panel yet.</div>
+          </div>
+        </section>
+      </div>
+    </section>
+  </main>
+
+  <footer class="site-footer">
+    <span>Open-source Android control demo</span>
+    <span>GitHub Pages + Firebase Realtime Database REST</span>
+  </footer>
+  <script src="app.js"></script>
+</body>
+</html>

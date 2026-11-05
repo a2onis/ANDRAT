@@ -1,0 +1,7 @@
+<resources>
+    <string name="app_name">Andrat Control</string>
+    <string name="service_channel_name">Remote control connection</string>
+    <string name="service_channel_description">Shows when the consent-based control connection is active.</string>
+    <string name="service_notification_title">Control connection active</string>
+    <string name="service_notification_text">Andrat Control is listening for commands from your panel.</string>
+</resources>

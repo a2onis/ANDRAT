@@ -1,0 +1,17 @@
+# Android / Gradle
+.gradle/
+**/build/
+local.properties
+*.iml
+.idea/
+*.hprof
+captures/
+.externalNativeBuild/
+.cxx/
+
+# Local panel overrides
+panel/config.local.js
+
+# OS files
+.DS_Store
+Thumbs.db

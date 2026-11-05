@@ -1,0 +1,72 @@
+name: Build Android APK
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - "app/**"
+      - "build.gradle.kts"
+      - "settings.gradle.kts"
+      - "gradle.properties"
+      - ".github/workflows/build-android.yml"
+  pull_request:
+    paths:
+      - "app/**"
+      - "build.gradle.kts"
+      - "settings.gradle.kts"
+      - "gradle.properties"
+      - ".github/workflows/build-android.yml"
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v5
+
+      - name: Set up Java
+        uses: actions/setup-java@v5
+        with:
+          distribution: temurin
+          java-version: "17"
+
+      - name: Confirm Android SDK
+        run: |
+          echo "ANDROID_HOME=${ANDROID_HOME}"
+          sdkmanager --list | sed -n '1,12p'
+
+      - name: Set up Gradle
+        uses: gradle/actions/setup-gradle@v4
+        with:
+          gradle-version: "8.7"
+
+      - name: Assemble debug APK
+        run: |
+          set -o pipefail
+          gradle assembleDebug --stacktrace --console=plain 2>&1 | tee build.log
+
+      - name: Surface build failure
+        if: ${{ failure() }}
+        run: |
+          while IFS= read -r line; do
+            echo "::error::${line}"
+          done < <(tail -n 60 build.log)
+
+      - name: Upload APK
+        if: ${{ success() }}
+        uses: actions/upload-artifact@v4
+        with:
+          name: andrat-control-debug-apk
+          path: app/build/outputs/apk/debug/app-debug.apk
+
+      - name: Upload build log
+        if: ${{ always() }}
+        uses: actions/upload-artifact@v4
+        with:
+          name: andrat-control-build-log
+          path: build.log
+          if-no-files-found: ignore

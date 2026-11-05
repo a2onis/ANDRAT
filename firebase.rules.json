@@ -1,0 +1,31 @@
+{
+  "rules": {
+    "devices": {
+      "$deviceId": {
+        "status": {
+          ".read": true,
+          ".write": "newData.hasChildren(['deviceId', 'lastSeen', 'online']) && newData.child('deviceId').val() == $deviceId",
+          ".validate": "newData.child('deviceId').isString() && newData.child('lastSeen').isNumber() && newData.child('online').isBoolean()"
+        },
+        "inbox": {
+          "$token": {
+            ".read": true,
+            ".write": true,
+            "$commandId": {
+              ".validate": "newData.hasChildren(['id', 'type', 'createdAt', 'payload']) && newData.child('id').val() == $commandId && (newData.child('type').val() == 'ping' || newData.child('type').val() == 'vibrate' || newData.child('type').val() == 'flashlight' || newData.child('type').val() == 'notify' || newData.child('type').val() == 'status') && newData.child('createdAt').isNumber()"
+            }
+          }
+        },
+        "acks": {
+          "$token": {
+            ".read": true,
+            ".write": true,
+            "$commandId": {
+              ".validate": "newData.hasChildren(['commandId', 'type', 'ok', 'completedAt']) && newData.child('commandId').val() == $commandId && newData.child('ok').isBoolean() && newData.child('completedAt').isNumber()"
+            }
+          }
+        }
+      }
+    }
+  }
+}
