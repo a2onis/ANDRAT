@@ -86,6 +86,10 @@ public final class ControlRepository {
         return deviceRoot(endpoint, deviceId) + "/inbox/" + segment(token);
     }
 
+    private String ackRoot(String endpoint, String deviceId, String token) {
+        return deviceRoot(endpoint, deviceId) + "/acks/" + segment(token);
+    }
+
     private static String segment(String value) {
         try {
             return URLEncoder.encode(value, StandardCharsets.UTF_8.name())
